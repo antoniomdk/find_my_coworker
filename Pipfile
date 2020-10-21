@@ -10,6 +10,8 @@ facenet-pytorch = "*"
 face-recognition = "*"
 matplotlib = "*"
 typer = "*"
+mxnet = "*"
+insightface = "*"
 
 [requires]
 python_version = "3.7"
