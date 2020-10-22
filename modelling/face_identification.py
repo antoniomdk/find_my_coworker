@@ -1,5 +1,4 @@
 import pickle
-import face_recognition
 from PIL import Image
 import typer
 from pathlib import Path
@@ -7,6 +6,7 @@ from typing import List, Dict, NamedTuple, Tuple
 from insightface.app import FaceAnalysis, Face
 from numpy.linalg import norm
 import numpy as np
+import PIL
 
 app = typer.Typer()
 
@@ -27,6 +27,13 @@ def convert_bounding_box(box):
     return x0, y0, x1, y1
 
 
+def load_image_file(file, mode='RGB'):
+    im = PIL.Image.open(file)
+    if mode:
+        im = im.convert(mode)
+    return np.array(im)
+
+
 @app.command(name='create_dataset')
 def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
     faces_folder.mkdir(parents=True, exist_ok=True)
@@ -38,7 +45,7 @@ def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
         if not file.is_file() or file.suffix.lower() not in ['.png', '.jpg', '.jpeg']:
             continue
 
-        img = face_recognition.load_image_file(file)
+        img = load_image_file(file)
         faces = retina.get(img, det_thresh=0.5)
         count_faces += len(faces)
 
