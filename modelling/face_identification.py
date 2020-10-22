@@ -15,7 +15,7 @@ class Result(NamedTuple):
     box: Tuple[int, int, int, int]
     person: str
     score: float
-    drunk_level: float
+    drunk: bool
     age: int
     gender: bool
 
@@ -50,12 +50,16 @@ def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
         count_faces += len(faces)
 
         for i, face in enumerate(faces):
-            x0, y0, x1, y1 = convert_bounding_box(face.bbox)
-            face_img = img[y0:y1, x0:x1]
-            new_file = faces_folder / f'{file.stem}_{i}.jpg'
-            Image.fromarray(face_img).save(new_file)
-            with new_file.with_suffix('.pkl').open('wb') as f:
-                pickle.dump(face, f)
+            try:
+                x0, y0, x1, y1 = convert_bounding_box(face.bbox)
+                print(x0, y0, x1, y1)
+                face_img = img[y0:y1, x0:x1]
+                new_file = faces_folder / f'{file.stem}_{i}.jpg'
+                Image.fromarray(face_img).save(new_file)
+                with new_file.with_suffix('.pkl').open('wb') as f:
+                    pickle.dump(face, f)
+            except:
+                pass
 
         count_images += 1
     print(f'{count_faces} faces found in {count_images} images')
@@ -72,23 +76,44 @@ def get_closest_embedding(face: Face, embeddings: Dict[str, List[Face]]):
     return max(scores.items(), key=lambda x: x[1])
 
 
-def load_embeddings(embeddings_folder: Path):
-    result = {}
+def load_embeddings(embeddings_folder: Path) -> Tuple[Dict[str, List[Face]], Dict[str, List[Face]]]:
+    drunk, no_drunk = {}, {}
     subdirectories = [x for x in embeddings_folder.iterdir() if x.is_dir()]
     for subdir in subdirectories:
-        files = subdir.glob('*.pkl')
-        result[subdir.name] = [pickle.load(x.open('rb')) for x in files]
+        drunk_files = subdir.glob('drunk/*.pkl')
+        np_drunk_files = subdir.glob('no_drunk/*.pkl')
+        drunk[subdir.name] = [pickle.load(x.open('rb')) for x in drunk_files]
+        no_drunk[subdir.name] = [pickle.load(x.open('rb')) for x in np_drunk_files]
+    return drunk, no_drunk
+
+
+def merge_embedding_dicts(d1, d2):
+    result = {}
+    for k, v in d1.items():
+        result[k] = d2[k] + v
     return result
 
 
-def inference(img, face_analysis: FaceAnalysis, embeddings: Dict[str, List[Face]]) -> List[Result]:
+def inference(img, face_analysis: FaceAnalysis,
+              drunk_embeddings: Dict[str, List[Face]],
+              no_drunk_embeddings: Dict[str, List[Face]]) -> List[Result]:
     faces = face_analysis.get(img)
     result = []
+    embeddings = merge_embedding_dicts(drunk_embeddings, no_drunk_embeddings)
+
     for face in faces:
         box = convert_bounding_box(face.bbox)
         person, score = get_closest_embedding(face, embeddings)
-        drunk_level = 1.0  # TODO
-        result.append(Result(box, person, score, drunk_level, face.age, face.gender))
+        drunk_embs = drunk_embeddings.get(person)
+        if drunk_embs:
+            _, drunk_score = get_closest_embedding(face, drunk_embeddings)
+            _, no_drunk_score = get_closest_embedding(face, no_drunk_embeddings)
+        else:
+            no_drunk_score = 1
+            drunk_score = 0
+        drunk = drunk_score > no_drunk_score
+        result.append(Result(box, person, score, drunk, face.age, face.gender))
+
     return result
 
 
