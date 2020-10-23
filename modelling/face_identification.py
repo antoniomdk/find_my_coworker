@@ -6,7 +6,10 @@ from typing import List, Dict, NamedTuple, Tuple
 from insightface.app import FaceAnalysis, Face
 from numpy.linalg import norm
 import numpy as np
+import shutil
 import PIL
+from sklearn.cluster import DBSCAN
+
 
 app = typer.Typer()
 
@@ -58,9 +61,9 @@ def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
                 Image.fromarray(face_img).save(new_file)
                 with new_file.with_suffix('.pkl').open('wb') as f:
                     pickle.dump(face, f)
-            except:
-                pass
-
+            except Exception as e:
+                print(e)
+        print(f'Processed image: {file}')
         count_images += 1
     print(f'{count_faces} faces found in {count_images} images')
 
@@ -115,6 +118,30 @@ def inference(img, face_analysis: FaceAnalysis,
         result.append(Result(box, person, score, drunk, face.age, face.gender))
 
     return result
+
+
+@app.command(name='clustering')
+def faces_clustering(input_directory: Path, output_directory: Path):
+    faces_files = list(input_directory.glob('*.pkl'))
+    faces: List[Face] = [pickle.load(x.open('rb')) for x in faces_files]
+    clustering = DBSCAN(eps=0.95, metric="euclidean", n_jobs=-1)
+    embeddings = np.array([face.normed_embedding for face in faces])
+    clustering.fit(embeddings)
+    labels_ids = np.unique(clustering.labels_)
+    num_unique_faces = len(np.where(labels_ids > -1)[0])
+    print(num_unique_faces, 'unique faces')
+
+    for label in labels_ids:
+        indices = np.where(clustering.labels_ == label)[0]
+        subdir = output_directory / f'person_{label}'
+        subdir.mkdir(parents=True, exist_ok=True)
+
+        for i in indices:
+            face_filename = faces_files[i]
+            face_img = face_filename.with_suffix('.jpg')
+            shutil.copy(face_filename, subdir / face_filename.name)
+            if face_img.exists():
+                shutil.copy(face_img, subdir / face_img.name)
 
 
 if __name__ == "__main__":
