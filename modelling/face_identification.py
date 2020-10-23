@@ -68,9 +68,11 @@ def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
     print(f'{count_faces} faces found in {count_images} images')
 
 
-def compute_mean_score(face: Face, embeddings: List[Face]):
-    scores = [np.dot(face.embedding, other.embedding) / (norm(face.embedding) * norm(other.embedding))
-              for other in embeddings]
+def compute_mean_score(face: Face, face_database: List[Face]):
+    embeddings = [face.embedding for face in face_database]
+    embeddings = np.unique(embeddings, axis=0)
+    scores = [np.dot(face.embedding, embedding) / (norm(face.embedding) * norm(embedding))
+              for embedding in embeddings]
     return np.mean(scores)
 
 
@@ -84,9 +86,11 @@ def load_embeddings(embeddings_folder: Path) -> Tuple[Dict[str, List[Face]], Dic
     subdirectories = [x for x in embeddings_folder.iterdir() if x.is_dir()]
     for subdir in subdirectories:
         drunk_files = subdir.glob('drunk/*.pkl')
-        np_drunk_files = subdir.glob('no_drunk/*.pkl')
+        no_drunk_files = subdir.glob('no_drunk/*.pkl')
         drunk[subdir.name] = [pickle.load(x.open('rb')) for x in drunk_files]
-        no_drunk[subdir.name] = [pickle.load(x.open('rb')) for x in np_drunk_files]
+        no_drunk[subdir.name] = [pickle.load(x.open('rb')) for x in no_drunk_files]
+        if not no_drunk_files and not drunk_files:
+            no_drunk[subdir.name] = [pickle.load(x.open('rb')) for x in subdir.glob('*.pkl')]
     return drunk, no_drunk
 
 
