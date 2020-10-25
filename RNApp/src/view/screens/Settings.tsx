@@ -6,6 +6,7 @@ import { Navigation } from 'react-native-navigation'
 import { RNCamera } from 'react-native-camera'
 
 const Settings: React.FC = () => {
+  let camera = React.createRef<RNCamera>()
   const showBurgerMenu = () => {
     Navigation.mergeOptions('drawerComponentId', {
       sideMenu: {
@@ -17,9 +18,9 @@ const Settings: React.FC = () => {
   }
 
   async function takePicture(){
-    if (this.cameraRef) {
+    if (camera) {
       const options = { quality: 0.5, base64: true };
-      const data = await this.cameraRef.takePictureAsync(options);
+      const data = await camera.current!.takePictureAsync(options);
       console.log(data.uri)
       //TODO: GO TO OTHER SCREEN 
       //SHOW THE IMAGE 
@@ -40,7 +41,7 @@ const Settings: React.FC = () => {
       </TouchableOpacity>
       <View style={styles.container}>
         <RNCamera
-          ref={(ref) => this.cameraRef = ref}
+          ref={camera}
           style={styles.preview}
           type={RNCamera.Constants.Type.back}
           flashMode={RNCamera.Constants.FlashMode.off}
