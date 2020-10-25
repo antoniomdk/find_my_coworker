@@ -4,6 +4,7 @@ import React, { useRef } from 'react'
 import { CText } from '../elements/custom'
 import { Navigation } from 'react-native-navigation'
 import { RNCamera } from 'react-native-camera'
+import Defaults from '../../config'
 
 const Settings: React.FC = () => {
   let camera = React.createRef<RNCamera>()
@@ -21,14 +22,41 @@ const Settings: React.FC = () => {
     if (camera) {
       const options = { quality: 0.5, base64: true };
       const data = await camera.current!.takePictureAsync(options);
-      console.log(data.uri)
+
       //TODO: GO TO OTHER SCREEN 
       //SHOW THE IMAGE 
-      //SEND TO API 
+      handleOnPictureTaken(data.uri) //SEND TO API 
       //SPINNER WHILE API IS PROCESSING 
       //SHOW RESULT
     }
   }
+
+  function handleOnPictureTaken (image: string) {
+    const name = image.split('/').pop()
+    const extension = name?.split('.').pop()
+    const type = `image/${extension}`
+    const source = { uri: image, type, name }
+    // @ts-ignore
+    uploadImage(source)
+  }
+
+  async function uploadImage(photoData: string | Blob){
+      const data = new FormData()
+      data.append('name', 'Image Upload')
+      data.append('photo', photoData)
+      const res = await fetch(
+        `${Defaults.apis.baseUrl}/prediction/`,
+        {
+          method: 'post',
+          body: data,
+          headers: {
+            'Content-Type': 'multipart/form-data; ',
+          },
+        }
+      )
+      console.log('api response', res)
+    }
+
 
   return (
     <SafeAreaView style={styles.container}>
