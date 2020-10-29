@@ -10,6 +10,10 @@ matplotlib = "*"
 typer = "*"
 mxnet = "*"
 insightface = "*"
+fastapi = "*"
+uvicorn = "*"
+python-multipart = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.7"
