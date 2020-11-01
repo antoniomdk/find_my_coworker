@@ -141,6 +141,7 @@ android {
             exclude "lib/arm64-v8a/libgnustl_shared.so"
         }
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative63"
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
