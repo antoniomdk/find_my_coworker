@@ -2,7 +2,8 @@ import pickle
 from PIL import Image
 import typer
 from pathlib import Path
-from typing import List, Dict, NamedTuple, Tuple
+from typing import List, Dict, Tuple
+from pydantic import BaseModel
 from insightface.app import FaceAnalysis, Face
 from numpy.linalg import norm
 import numpy as np
@@ -14,7 +15,7 @@ from sklearn.cluster import DBSCAN
 app = typer.Typer()
 
 
-class Result(NamedTuple):
+class Result(BaseModel):
     box: Tuple[int, int, int, int]
     person: str
     score: float
@@ -68,16 +69,16 @@ def extract_faces_from_folder(raw_images_folder: Path, faces_folder: Path):
     print(f'{count_faces} faces found in {count_images} images')
 
 
-def compute_mean_score(face: Face, face_database: List[Face]):
+def compute_score(face: Face, face_database: List[Face], agg='mean'):
     embeddings = [face.embedding for face in face_database]
     embeddings = np.unique(embeddings, axis=0)
     scores = [np.dot(face.embedding, embedding) / (norm(face.embedding) * norm(embedding))
               for embedding in embeddings]
-    return np.mean(scores)
+    return np.mean(scores) if agg == 'mean' else np.max(scores)
 
 
 def get_closest_embedding(face: Face, embeddings: Dict[str, List[Face]]):
-    scores = {k: compute_mean_score(face, v) for k, v in embeddings.items()}
+    scores = {k: compute_score(face, v) for k, v in embeddings.items()}
     return max(scores.items(), key=lambda x: x[1])
 
 
@@ -113,13 +114,14 @@ def inference(img, face_analysis: FaceAnalysis,
         person, score = get_closest_embedding(face, embeddings)
         drunk_embs = drunk_embeddings.get(person)
         if drunk_embs:
-            _, drunk_score = get_closest_embedding(face, drunk_embeddings)
-            _, no_drunk_score = get_closest_embedding(face, no_drunk_embeddings)
+            drunk_score = compute_score(face, drunk_embs, agg='max')
+            no_drunk_score = compute_score(face, no_drunk_embeddings[person], agg='max')
         else:
             no_drunk_score = 1
             drunk_score = 0
         drunk = drunk_score > no_drunk_score
-        result.append(Result(box, person, score, drunk, face.age, face.gender))
+        result.append(Result(box=box, person=person, score=score,
+                             drunk=drunk, age=face.age, gender=face.gender))
 
     return result
 

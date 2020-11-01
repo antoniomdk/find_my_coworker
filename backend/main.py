@@ -1,17 +1,25 @@
 from fastapi import UploadFile, File, FastAPI, HTTPException
 from PIL import Image, UnidentifiedImageError
 from io import BytesIO
+from pathlib import Path
+from typing import List
+import numpy as np
+from backend.modelling.face_identification import load_embeddings, inference, FaceAnalysis, Result
 
 app = FastAPI()
+drunk_embeddings, no_drunk_embeddings = load_embeddings(Path('../dataset'))
+face_analysis = FaceAnalysis()
+face_analysis.prepare(-1)
 
-@app.post("/prediction/")
+
+@app.post("/prediction/", response_model=List[Result])
 async def upload_photo(photo: UploadFile = File(...)):
-  try:
-    photo_bytes = BytesIO(await photo.read())
-    image = Image.open(photo_bytes)
-
-    image.save(photo.filename)
-
-    return {"filename": photo.filename, "type": photo.content_type}
-  except UnidentifiedImageError:
-    raise HTTPException(400, "Unsupported image format")
+    try:
+        photo_bytes = BytesIO(await photo.read())
+        image = Image.open(photo_bytes)
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
+        numpy_image = np.array(image)
+        return inference(numpy_image, face_analysis, drunk_embeddings, no_drunk_embeddings)
+    except UnidentifiedImageError:
+        raise HTTPException(400, "Unsupported image format")
