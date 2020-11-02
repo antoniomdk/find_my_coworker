@@ -1,87 +1,21 @@
-/**
- * Application navigation stacks to be defined here.
- */
-import { Navigation } from 'react-native-navigation';
+// In App.js in a new project
 
-import { SCREENS } from '../constants/screen';
-import { TYPOGRAPHY } from '../view/styles/typography';
+import * as React from 'react';
+import { View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Home from '../view/screens/Home'
 
-export const tabbedNavigation = () =>
-  Navigation.setRoot({
-    root: {
-      sideMenu: {
-        left: {
-          component: {
-            name: SCREENS.Drawer,
-            id: 'drawerComponentId',
-          },
-        },
-        center: {
-          bottomTabs: {
-            id: 'BottomTabsId',
-            children: [
-              {
-                stack: {
-                  children: [
-                    {
-                      component: {
-                        name: SCREENS.Home,
-                        passProps: {
-                          text: 'This is Home',
-                        },
-                      },
-                    },
-                  ],
-                  options: {
-                    topBar: {
-                      visible: false,
-                      drawBehind: true,
-                      animate: true,
-                    },
-                    bottomTab: {
-                      fontSize: 14,
-                      text: 'Home',
-                      textColor: TYPOGRAPHY.COLOR.Primary,
-                      selectedTextColor: TYPOGRAPHY.COLOR.Warning,
-                      selectedIconColor: TYPOGRAPHY.COLOR.Warning,
-                      icon: require('../view/assets/images/tabbar/home.png'),
-                      selectedIcon: require('../view/assets/images/tabbar/home.png'),
-                    },
-                  },
-                },
-              },
-              {
-                stack: {
-                  children: [
-                    {
-                      component: {
-                        name: SCREENS.Settings,
-                      },
-                    },
-                  ],
-                  options: {
-                    topBar: {
-                      visible: false,
-                      drawBehind: true,
-                      animate: true,
-                    },
-                    bottomTab: {
-                      text: 'Settings',
-                      fontSize: 14,
-                      textColor: TYPOGRAPHY.COLOR.Primary,
-                      selectedTextColor: TYPOGRAPHY.COLOR.Warning,
-                      selectedIconColor: TYPOGRAPHY.COLOR.Warning,
-                      icon: require('../view/assets/images/tabbar/settings.png'),
-                      selectedIcon: require('../view/assets/images/tabbar/settings.png'),
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-    },
-  });
+const Stack = createStackNavigator();
 
-export default tabbedNavigation;
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+export default App;

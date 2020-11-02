@@ -36,8 +36,8 @@
   "dependencies": {
     "react": "^16.13.1",
     "react-native": "^0.63.3",
-    "react-native-camera": "^3.40.0",
-    "react-native-navigation": "^7.1.0",
+    "react-native-image-picker": "^2.3.4",
+    "react-native-navigation": "^7.2.0",
     "react-redux": "^7.0.3",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0"

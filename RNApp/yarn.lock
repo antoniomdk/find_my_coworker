@@ -7207,17 +7207,15 @@ react-lifecycles-compat@2.0.0:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-2.0.0.tgz#71d9c4cde47114c4102454f76da055c2bc48c948"
   integrity sha512-txfpPCQYiazVdcbMRhatqWKcAxJweUu2wDXvts5/7Wyp6+Y9cHojqXHsLPEckzutfHlxZhG8Oiundbmp8Fd6eQ==
 
-react-native-camera@^3.40.0:
-  version "3.40.0"
-  resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-3.40.0.tgz#69845991e46b0892cc2b50322d49b18f292c3202"
-  integrity sha512-Ur0hZqZcl3SntTVMB9GxuiLYpQxqwgzhQVb+7EGae4WjfDzQEwlGF0bJ7UpZyeUTb1oZmsiSib58xUckn11XMw==
-  dependencies:
-    prop-types "^15.6.2"
+react-native-image-picker@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-2.3.4.tgz#1c31dbe9872ade17e2ed6457b0c669d63c322590"
+  integrity sha512-4UHu+zOyDT570r5mIbjH6h1iMrKIq/qfsKiAVUEZwncVegh0usJiEYNyJw4CEVwNeehmye/ia5sLDsa+kzIE4g==
 
-react-native-navigation@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-navigation/-/react-native-navigation-7.1.0.tgz#05dbfc6b31dd6a8aa626a74b2f51e1cc031b230d"
-  integrity sha512-Ub5eegREee2kyI8OXAzPXAe9dJgVBpj8k3Ni4HfzA2D3+xVGwvskCmKkIJm2xU/i1GcM9TdzoloB1JHsAZl6Qw==
+react-native-navigation@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-navigation/-/react-native-navigation-7.2.0.tgz#6ab51e6502c558541518c0ed0c197053a6d0a9a2"
+  integrity sha512-B9vJgKvvvQ55GE3A734PrPIM6iGAnUlZNA3Mt9cyX5WJsWofLUbq+L5XxMyTJZDDcKuK5blz6cxg9Zl1O1TaVQ==
   dependencies:
     hoist-non-react-statics "3.x.x"
     lodash "4.17.x"

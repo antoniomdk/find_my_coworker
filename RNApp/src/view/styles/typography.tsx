@@ -7,6 +7,7 @@ const COLOR = {
   Border: '#E7E7E8',
   Success: '#2BC480',
   Warning: '#D91E5B',
+  Blue: '#264458'
 };
 
 const FONT = {

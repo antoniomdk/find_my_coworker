@@ -85,13 +85,13 @@ const TEXT = StyleSheet.create({
     textAlign: 'left',
     fontFamily: TYPOGRAPHY.FONT.Primary,
     fontSize: 14,
-    color: TYPOGRAPHY.COLOR.Primary,
+    color: 'white',
   },
   Bold: {
     textAlign: 'left',
     fontSize: 14,
     fontFamily: TYPOGRAPHY.FONT.Primary,
-    color: TYPOGRAPHY.COLOR.Primary,
+    color: 'white',
   },
 })
 
