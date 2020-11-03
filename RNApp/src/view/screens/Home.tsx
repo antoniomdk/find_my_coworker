@@ -5,6 +5,7 @@ import { CText } from '../elements/custom'
 import ImagePicker from 'react-native-image-picker'
 import Defaults from '../../config'
 import Box from '../elements/Box'
+import Switch from '../elements/Switch'
 
 const options = {
   title: 'Selecciona foto',
@@ -29,8 +30,10 @@ const Home: React.FC = () => {
   const [image, setImage] = useState<any>(null)
   const [results, setResults] = useState<Person[] | null>(null)
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   function onSelectPicture(response: any) {
+    setError(null)
     setResults(null)
     setSelectedPerson(null)
     setImage(null)
@@ -40,21 +43,12 @@ const Home: React.FC = () => {
     } else if (response.error) {
       console.log('ImagePicker Error: ', response.error)
     } else {
-      const source = { uri: response.uri }
-
       handleOnPictureTaken(response.uri)
       setImage(response)
-      //uploadImage(response)
-      // You can also display the image using data:
-      // const source = { uri: 'data:image/jpegbase64,' + response.data }
-
-      /*       this.setState({
-              avatarSource: source,
-            }) */
     }
   }
 
-  function handleOnPictureTaken (image: string) {
+  function handleOnPictureTaken(image: string) {
     const name = image.split('/').pop()
     const extension = name?.split('.').pop()
     const type = `image/${extension}`
@@ -80,58 +74,68 @@ const Home: React.FC = () => {
         }
       )
 
-      const formattedResponse = await response.json()
-      setResults(formattedResponse)
-      if(formattedResponse.length === 1){
-        setSelectedPerson(formattedResponse[0])
+      if (response.status === 200) {
+        const persons = await response.json()
+        setResults(persons)
+        if (persons.length === 0) {
+          setError('No se han encontrado resultados')
+        }
+        if (persons.length === 1) {
+          setSelectedPerson(persons[0])
+        }
+      } else {
+        setError('Error procesando imagen')
       }
+
     } catch (err) {
-      console.log('Error procesando imagen')
+      setError('Error procesando imagen')
     }
     setIsLoading(false)
   }
 
 
   let imgHeight = 0
-  if(image?.width ){
+  if (image?.width) {
     imgHeight = (image.height * WINDOWS_WIDTH) / image.width
   }
-  console.log('response', results)
+
   return (
     <SafeAreaView style={styles.container}>
       <CText style={styles.title}>Find my Coworker</CText>
       <CText style={styles.subtitle}>(Celtiberian edition)</CText>
-      {isLoading && (
-          <>
-            <ActivityIndicator size="large" color="white" />
-            <CText style={styles.processing}>Procesando imagen...</CText>
-          </>
-        )}
+      <Switch condition={isLoading}>
+        <ActivityIndicator size="large" color="white" />
+        <CText style={styles.processing}>Procesando imagen...</CText>
+      </Switch>
       <View style={styles.content}>
-       
-        {!!image && (
+        <Switch condition={!!image?.uri}>
           <View style={[styles.imageContainer, { height: imgHeight }]}>
             <Image
               style={[styles.image, { height: imgHeight }]}
-              source={{uri: image.uri}}
+              source={{ uri: image?.uri }}
               resizeMode='contain'
               resizeMethod='resize'
             />
-            {results && results.map((person, index) => {
-              return <Box key={index} height={image.height} width={image.width} person={person} imgHeight={imgHeight} onSelectPerson={() => setSelectedPerson(person)}/>
-            })}
+            <Switch condition={!!results}>
+              {results?.map((person, index) => {
+                return <Box key={index} height={image.height} width={image.width} person={person} imgHeight={imgHeight} onSelectPerson={() => setSelectedPerson(person)} />
+              })}
+            </Switch>
           </View>
-        )}
-        {!!selectedPerson && (
-          <View> 
-            <CText style={styles.buttonText}>Nombre: {selectedPerson.person}</CText>
-            <CText style={styles.buttonText}>Score: {selectedPerson.score}</CText>
-            <CText style={styles.buttonText}>Borracho: {selectedPerson.drunk ? 'Si' : 'No'}</CText>
-            <CText style={styles.buttonText}>Edad: {selectedPerson.age}</CText>
+        </Switch>
+        <Switch condition={!!selectedPerson}>
+          <View>
+            <CText style={styles.buttonText}>Nombre: {selectedPerson?.person}</CText>
+            <CText style={styles.buttonText}>Score: {selectedPerson?.score}</CText>
+            <CText style={styles.buttonText}>Borracho: {selectedPerson?.drunk ? 'Si' : 'No'}</CText>
+            <CText style={styles.buttonText}>Edad: {selectedPerson?.age}</CText>
           </View>
-        )}
+        </Switch>
       </View>
       <View style={styles.buttons}>
+        <Switch condition={!!error}>
+          <CText style={styles.error}>{error}</CText>
+        </Switch>
         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
           <CText style={styles.buttonText}>Haz una foto</CText>
         </TouchableOpacity>
@@ -168,6 +172,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
+  },
+  error: {
+    fontSize: 18,
+    marginBottom: 16,
   },
   processing: {
     fontSize: 18,
