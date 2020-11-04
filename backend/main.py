@@ -24,6 +24,7 @@ async def upload_photo(photo: UploadFile = File(...)):
         image = Image.open(photo_bytes)
         if image.mode == 'RGBA':
             image = image.convert('RGB')
+        image.thumbnail((1280, 720))
         numpy_image = np.array(image)
         return inference(numpy_image, face_analysis, drunk_embeddings, no_drunk_embeddings)
     except UnidentifiedImageError:
