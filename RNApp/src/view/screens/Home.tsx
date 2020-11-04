@@ -1,4 +1,12 @@
-import { SafeAreaView, StyleSheet, TouchableOpacity, View, ActivityIndicator, Image, Dimensions } from 'react-native'
+import {
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Image,
+  Dimensions,
+} from 'react-native'
 import { TYPOGRAPHY } from '../styles/typography'
 import React, { useState } from 'react'
 import { CText } from '../elements/custom'
@@ -78,17 +86,17 @@ const Home: React.FC = () => {
         const persons = await response.json()
         setResults(persons)
         if (persons.length === 0) {
-          setError('No se han encontrado resultados')
+          setError('No results found')
         }
         if (persons.length === 1) {
           setSelectedPerson(persons[0])
         }
       } else {
-        setError('Error procesando imagen')
+        setError('An error occurred')
       }
 
     } catch (err) {
-      setError('Error procesando imagen')
+      setError('An error occurred')
     }
     setIsLoading(false)
   }
@@ -105,7 +113,7 @@ const Home: React.FC = () => {
       <CText style={styles.subtitle}>(Celtiberian edition)</CText>
       <Switch condition={isLoading}>
         <ActivityIndicator size="large" color="white" />
-        <CText style={styles.processing}>Procesando imagen...</CText>
+        <CText style={styles.processing}>Processing image...</CText>
       </Switch>
       <View style={styles.content}>
         <Switch condition={!!image?.uri}>
@@ -125,10 +133,10 @@ const Home: React.FC = () => {
         </Switch>
         <Switch condition={!!selectedPerson}>
           <View>
-            <CText style={styles.buttonText}>Nombre: {selectedPerson?.person}</CText>
+            <CText style={styles.buttonText}>Name: {selectedPerson?.person}</CText>
             <CText style={styles.buttonText}>Score: {selectedPerson?.score}</CText>
-            <CText style={styles.buttonText}>Borracho: {selectedPerson?.drunk ? 'Si' : 'No'}</CText>
-            <CText style={styles.buttonText}>Edad: {selectedPerson?.age}</CText>
+            <CText style={styles.buttonText}>Drunk: {selectedPerson?.drunk ? 'Yes' : 'No'}</CText>
+            <CText style={styles.buttonText}>Age: {selectedPerson?.age}</CText>
           </View>
         </Switch>
       </View>
@@ -137,10 +145,10 @@ const Home: React.FC = () => {
           <CText style={styles.error}>{error}</CText>
         </Switch>
         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
-          <CText style={styles.buttonText}>Haz una foto</CText>
+          <CText style={styles.buttonText}>Take Photo</CText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchImageLibrary(options, onSelectPicture)}>
-          <CText style={styles.buttonText}>Selecciona una foto</CText>
+          <CText style={styles.buttonText}>Select from Gallery</CText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
