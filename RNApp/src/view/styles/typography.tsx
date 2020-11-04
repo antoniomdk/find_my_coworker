@@ -5,9 +5,10 @@ const COLOR = {
   Default: '#FFFFFF',
   DefaultSelected: '#222222',
   Border: '#E7E7E8',
-  Success: '#2BC480',
+  Success: '#42f542',
   Warning: '#D91E5B',
-  Blue: '#264458'
+  Blue: '#264458',
+  Danger: 'red',
 };
 
 const FONT = {

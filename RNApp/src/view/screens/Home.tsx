@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
+  Text,
 } from 'react-native'
 import { TYPOGRAPHY } from '../styles/typography'
 import React, { useState } from 'react'
@@ -111,10 +112,6 @@ const Home: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <CText style={styles.title}>Find my Coworker</CText>
       <CText style={styles.subtitle}>(Celtiberian edition)</CText>
-      <Switch condition={isLoading}>
-        <ActivityIndicator size="large" color="white" />
-        <CText style={styles.processing}>Processing image...</CText>
-      </Switch>
       <View style={styles.content}>
         <Switch condition={!!image?.uri}>
           <View style={[styles.imageContainer, { height: imgHeight }]}>
@@ -131,20 +128,29 @@ const Home: React.FC = () => {
             </Switch>
           </View>
         </Switch>
-        <Switch condition={!!selectedPerson}>
-          <View>
+        <View style={styles.data}>
+          <Switch condition={!!error}>
+            <CText style={styles.error}>{error}</CText>
+          </Switch>
+          <Switch condition={isLoading}>
+            <ActivityIndicator size="large" color="white" />
+            <CText style={styles.processing}>Processing image...</CText>
+          </Switch>
+          <Switch condition={!!selectedPerson}>
             <CText style={styles.buttonText}>Name: {selectedPerson?.person}</CText>
-            <CText style={styles.buttonText}>Score: {selectedPerson?.score}</CText>
-            <CText style={styles.buttonText}>Drunk: {selectedPerson?.drunk ? 'Yes' : 'No'}</CText>
+            <CText style={styles.buttonText}>Score: {selectedPerson?.score?.toFixed(2)}</CText>
+            <CText style={styles.buttonText}>
+              Drunk: {selectedPerson?.drunk ? 
+                <Text style={{color: TYPOGRAPHY.COLOR.Danger}}>Yes</Text> :
+                <Text style={{color: TYPOGRAPHY.COLOR.Success}}>No</Text>
+                }
+            </CText>
             <CText style={styles.buttonText}>Age: {selectedPerson?.age}</CText>
-          </View>
-        </Switch>
+          </Switch>
+        </View>
       </View>
-      <View style={styles.buttons}>
-        <Switch condition={!!error}>
-          <CText style={styles.error}>{error}</CText>
-        </Switch>
-        <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
+      <View style={styles.footer}>
+         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
           <CText style={styles.buttonText}>Take Photo</CText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchImageLibrary(options, onSelectPicture)}>
@@ -166,11 +172,10 @@ const styles = StyleSheet.create({
     backgroundColor: TYPOGRAPHY.COLOR.Blue,
   },
   content: {
-    flex: 1,
-    display: 'flex',
     justifyContent: 'center',
+    flexDirection: 'column',
   },
-  buttons: {
+  footer: {
     flex: 1,
     display: 'flex',
     width: '100%',
@@ -188,6 +193,7 @@ const styles = StyleSheet.create({
   processing: {
     fontSize: 18,
     marginTop: 16,
+    textAlign: 'center',
   },
   button: {
     borderWidth: 2,
@@ -201,12 +207,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    marginTop: 32,
+    marginTop: 8,
   },
   subtitle: {
-    fontSize: 24,
-    marginTop: 12,
-    marginBottom: 24,
+    fontSize: 18,
+    marginTop: 8,
+    marginBottom: 16,
   },
   image: {
     width: WINDOWS_WIDTH,
@@ -215,7 +221,11 @@ const styles = StyleSheet.create({
     height: 300,
     width: WINDOWS_WIDTH,
     position: 'relative',
-  }
+  },
+  data: {
+    margin: 36,
+    marginTop: 16
+  },
 })
 
 export default Home

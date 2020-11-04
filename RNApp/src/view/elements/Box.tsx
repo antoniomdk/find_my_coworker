@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
 import React from 'react'
 import { Person } from '../screens/Home'
+import { TYPOGRAPHY } from '../styles/typography'
 
 const WINDOWS_WIDTH = Dimensions.get('window').width
 
@@ -13,7 +14,7 @@ type Props = {
 }
 
 const Box: React.FC<Props> = ({ imgHeight, person, onSelectPerson, width, height }) => {
-    const { box } = person
+    const { box, drunk } = person
 
     const firstVertexWidth = (box[0] * WINDOWS_WIDTH) / width
     const firstVertexHeight = (box[1] * imgHeight) / height
@@ -29,8 +30,9 @@ const Box: React.FC<Props> = ({ imgHeight, person, onSelectPerson, width, height
             top: firstVertexHeight,
             width: boxWidth,
             height: boxHeight,
-            borderWidth: 1,
-            borderColor: 'red',
+            borderColor: drunk ?
+                TYPOGRAPHY.COLOR.Danger :
+                TYPOGRAPHY.COLOR.Success
         }]} />
     )
 }
@@ -39,7 +41,6 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         borderWidth: 1,
-        borderColor: 'red'
     },
 })
 
