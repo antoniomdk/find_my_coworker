@@ -9,7 +9,7 @@ from backend.modelling.face_identification import load_embeddings, inference, Fa
 
 app = FastAPI()
 drunk_embeddings, no_drunk_embeddings = load_embeddings(Path('../dataset'))
-face_analysis = FaceAnalysis()
+face_analysis = FaceAnalysis(ga_name=None)
 
 if npx.num_gpus() > 0:
     face_analysis.prepare(0)

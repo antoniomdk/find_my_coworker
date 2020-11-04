@@ -120,8 +120,9 @@ def inference(img, face_analysis: FaceAnalysis,
             no_drunk_score = 1
             drunk_score = 0
         drunk = drunk_score > no_drunk_score
-        result.append(Result(box=box, person=person, score=score,
-                             drunk=drunk, age=face.age, gender=face.gender))
+        age = np.mean([face.age for face in no_drunk_embeddings[person]])
+        gender = no_drunk_embeddings[person][0].gender
+        result.append(Result(box=box, person=person, score=score, drunk=drunk, age=age, gender=gender))
 
     return result
 
