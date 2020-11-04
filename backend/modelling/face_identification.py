@@ -104,15 +104,16 @@ def merge_embedding_dicts(d1, d2):
 
 def inference(img: np.ndarray, face_analysis: FaceAnalysis,
               drunk_embeddings: Dict[str, List[Face]],
-              no_drunk_embeddings: Dict[str, List[Face]]) -> List[Result]:
+              no_drunk_embeddings: Dict[str, List[Face]],
+              width: int, height: int) -> List[Result]:
     faces = face_analysis.get(img)
     result = []
     embeddings = merge_embedding_dicts(drunk_embeddings, no_drunk_embeddings)
 
     for face in faces:
         box = convert_bounding_box(face.bbox)
-        box = [float(box[0]) / img.shape[1], float(box[1]) / img.shape[0],
-               float(box[2]) / img.shape[1], float(box[3]) / img.shape[0]]
+        box = [float(width * box[0]) / img.shape[1], float(height * box[1]) / img.shape[0],
+               float(width * box[2]) / img.shape[1], float(height * box[3]) / img.shape[0]]
         person, score = get_closest_embedding(face, embeddings)
         drunk_embs = drunk_embeddings.get(person)
         if drunk_embs:
