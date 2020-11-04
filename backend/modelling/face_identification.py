@@ -24,6 +24,14 @@ class Result(BaseModel):
     gender: bool
 
 
+DRUNK_SCORES = {
+    'paolo': 0.25,
+    'navega': 0.2,
+    'david_fernandez': 0.2,
+    'angel_garcia': 0.1,
+    'german': 0.1
+}
+
 def convert_bounding_box(box):
     box = list(map(int, box))
     x0, x1 = min(box[0], box[2]), max(box[0], box[2])
@@ -117,7 +125,7 @@ def inference(img: np.ndarray, face_analysis: FaceAnalysis,
         person, score = get_closest_embedding(face, embeddings)
         drunk_embs = drunk_embeddings.get(person)
         if drunk_embs:
-            drunk_score = compute_score(face, drunk_embs, agg='max')
+            drunk_score = compute_score(face, drunk_embs, agg='max') + DRUNK_SCORES.get(person, 0.0)
             no_drunk_score = compute_score(face, no_drunk_embeddings[person], agg='max')
         else:
             no_drunk_score = 1
