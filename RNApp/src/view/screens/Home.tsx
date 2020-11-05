@@ -15,6 +15,7 @@ import ImagePicker from 'react-native-image-picker'
 import Defaults from '../../config'
 import Box from '../elements/Box'
 import Switch from '../elements/Switch'
+import * as Animatable from 'react-native-animatable'
 
 const options = {
   title: 'Selecciona foto',
@@ -114,7 +115,7 @@ const Home: React.FC = () => {
       <CText style={styles.subtitle}>(Celtiberian edition)</CText>
       <View style={styles.content}>
         <Switch condition={!!image?.uri}>
-          <View style={[styles.imageContainer, { height: imgHeight }]}>
+          <Animatable.View animation="fadeIn" style={[styles.imageContainer, { height: imgHeight }]}>
             <Image
               style={[styles.image, { height: imgHeight }]}
               source={{ uri: image?.uri }}
@@ -126,31 +127,35 @@ const Home: React.FC = () => {
                 return <Box key={index} height={image.height} width={image.width} person={person} imgHeight={imgHeight} onSelectPerson={() => setSelectedPerson(person)} />
               })}
             </Switch>
-          </View>
+          </Animatable.View>
         </Switch>
         <View style={styles.data}>
           <Switch condition={!!error}>
             <CText style={styles.error}>{error}</CText>
           </Switch>
           <Switch condition={isLoading}>
+          <Animatable.View animation="fadeIn">
             <ActivityIndicator size="large" color="white" />
             <CText style={styles.processing}>Processing image...</CText>
+            </Animatable.View>
           </Switch>
           <Switch condition={!!selectedPerson}>
-            <CText style={styles.buttonText}>Name: {selectedPerson?.person}</CText>
-            <CText style={styles.buttonText}>Score: {selectedPerson?.score?.toFixed(2)}</CText>
-            <CText style={styles.buttonText}>
-              Drunk: {selectedPerson?.drunk ? 
-                <Text style={{color: TYPOGRAPHY.COLOR.Danger}}>Yes</Text> :
-                <Text style={{color: TYPOGRAPHY.COLOR.Success}}>No</Text>
+            <Animatable.View animation="fadeIn">
+              <CText style={styles.buttonText}>Name: {selectedPerson?.person}</CText>
+              <CText style={styles.buttonText}>Score: {selectedPerson?.score?.toFixed(2)}</CText>
+              <CText style={styles.buttonText}>
+                Drunk: {selectedPerson?.drunk ?
+                  <Text style={{ color: TYPOGRAPHY.COLOR.Danger }}>Yes</Text> :
+                  <Text style={{ color: TYPOGRAPHY.COLOR.Success }}>No</Text>
                 }
-            </CText>
-            <CText style={styles.buttonText}>Age: {selectedPerson?.age}</CText>
+              </CText>
+              <CText style={styles.buttonText}>Age: {selectedPerson?.age}</CText>
+            </Animatable.View>
           </Switch>
         </View>
       </View>
       <View style={styles.footer}>
-         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
+        <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchCamera(options, onSelectPicture)}>
           <CText style={styles.buttonText}>Take Photo</CText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => ImagePicker.launchImageLibrary(options, onSelectPicture)}>
@@ -188,7 +193,8 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 18,
-    marginBottom: 16,
+    marginTop: 16,
+    textAlign: 'center',
   },
   processing: {
     fontSize: 18,
